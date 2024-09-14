@@ -1,5 +1,5 @@
 import Game from "./Game.js"
-import * as PIXI from "../pixi/pixi.mjs"
+import * as PIXI from "../lib/pixi.mjs"
 
 const pixiApp = new PIXI.Application({
     width: 1024,
