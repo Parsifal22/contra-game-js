@@ -25,6 +25,11 @@ export default class Hero {
         right: 0,
     }
 
+    #bulletContext = {
+        x: 0,
+        y: 0,
+        angle: 0,
+    }
 
     #state = States.Stay;
 
@@ -32,6 +37,8 @@ export default class Hero {
     #isStayUp = false;
 
     #view;
+    #bulletAngle;
+    
 
     constructor(stage){
         this.#view = new HeroView();
@@ -59,6 +66,16 @@ export default class Hero {
 
     get collisionBox(){
         return this.#view.collisionBox;
+    }
+
+    get bulletContext() {
+        this.#bulletContext.x = this.x + this.#view.bulletPointShift.x;
+        this.#bulletContext.y = this.y + this.#view.bulletPointShift.y;
+        this.#bulletContext.angle = this.#view.isFliped 
+            ? this.#bulletAngle * -1 + 180
+            : this.#bulletAngle;
+
+        return this.#bulletContext;
     }
 
     update(){
@@ -152,6 +169,7 @@ export default class Hero {
         this.#isLay = buttonContext.arrowDown;
         this.#isStayUp = buttonContext.arrowUp;
 
+        this.setBulletAngle(buttonContext);
 
         if (this.#state == States.Jump || this.#state == States.FlyDown){
             return;
@@ -181,6 +199,33 @@ export default class Hero {
             }
             
         }
+    }
+
+    setBulletAngle(buttonContext){
+        if(buttonContext.arrowLeft || buttonContext.arrowRight){
+            if(buttonContext.arrowUp){
+                this.#bulletAngle = -45;
+            }
+            else if(buttonContext.arrowDown){
+                this.#bulletAngle = 45;
+            }
+            else{
+                this.#bulletAngle = 0; 
+            }
+            
+        }
+        else{
+            if(buttonContext.arrowUp){
+                this.#bulletAngle = -90;
+            }
+            else if(buttonContext.arrowDown && this.#state == States.Jump){
+                this.#bulletAngle = 90;
+            }
+            else{
+                this.#bulletAngle = 0;
+            }
+            
+        }     
     }
 
 }
