@@ -35,13 +35,8 @@ export default class KeyboardProcessor{
         const button = this.#keyMap[key.code];
 
         if (button != undefined) {
-
             button.isDown = true;
-
-            if (button.hasOwnProperty("executeDown")) {
-                button.executeDown.call(this.#gameContext);
-            }
-            
+            button.executeDown?.call(this.#gameContext);
         }
  
     }
@@ -50,17 +45,12 @@ export default class KeyboardProcessor{
         const button = this.#keyMap[key.code];
 
         if (button != undefined) {
-
             button.isDown = false;
-
-            if (button.hasOwnProperty("executeUp")) {
-                button.executeUp.call(this.#gameContext);
-            }
-            button.isDown = false;
+            button.executeUp?.call(this.#gameContext);
         }
     }
 
     isButtonPressed(keyName){
-        return this.#keyMap[keyName].isDown;
+        return this.#keyMap[keyName]?.isDown;
     }
 }

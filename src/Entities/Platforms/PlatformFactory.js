@@ -1,15 +1,15 @@
 import Box from "./Box.js";
 import Platform from "./Platform.js";
 
-export default class PlatformFactory{
+export default class PlatformFactory {
 
     #worldContainer;
 
-    constructor(worldContainer){
+    constructor(worldContainer) {
         this.#worldContainer = worldContainer;
     }
 
-    createPlatform(x, y){
+    createPlatform(x, y) {
         const platform = new Platform();
         platform.x = x;
         platform.y = y;
@@ -18,7 +18,7 @@ export default class PlatformFactory{
         return platform;
     }
 
-    createBox(x, y){
+    createBox(x, y) {
         const box = new Box();
         box.x = x;
         box.y = y;

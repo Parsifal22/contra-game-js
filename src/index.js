@@ -8,11 +8,7 @@ const pixiApp = new PIXI.Application({
 const game = new Game(pixiApp);
 
 document.body.appendChild(pixiApp.renderer.view);
-document.addEventListener("keydown", function(key){
-    game.keyboardProcessor.onKeyDown(key);
-});
-document.addEventListener("keyup", function(key){
-    game.keyboardProcessor.onKeyUp(key);
-});
+document.addEventListener("keydown", key => game.keyboardProcessor.onKeyDown(key));
+document.addEventListener("keyup", key => game.keyboardProcessor.onKeyUp(key));
 
 pixiApp.ticker.add(game.update, game);
