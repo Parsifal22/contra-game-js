@@ -50,8 +50,6 @@ export default class HeroView extends Container {
         for (let key in this.#stm.states) {
             this.#rootNode.addChild(this.#stm.states[key]);
         }
-
-        //this.#rootNode.scale.x *=-1;
     }
 
     get collisionBox() {

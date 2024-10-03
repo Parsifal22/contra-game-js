@@ -1,6 +1,7 @@
 import { Container } from "../lib/pixi.mjs";
 import Camera from "./Camera.js";
 import BulletFactory from "./Entities/Bullets/BulletFactory.js";
+import RunnerFactory from "./Entities/Enemies/Runner/RunnerFactory.js";
 import Hero from "./Entities/Hero/Hero.js"
 import PlatformFactory from "./Entities/Platforms/PlatformFactory.js";
 import KeyboardProcessor from "./KeyboardProcessor.js";
@@ -11,8 +12,12 @@ export default class Game {
     #hero;
     #platforms = [];
     #bullets = [];
+    #enemies = [];
     #camera;
+
     #bulletFactory;
+    #runnerFactory;
+
     #worldContainer
     keyboardProcessor;
 
@@ -65,11 +70,20 @@ export default class Game {
         this.#camera = new Camera(cameraSettings);
 
         this.#bulletFactory = new BulletFactory();
+
+        this.#runnerFactory = new RunnerFactory(this.#worldContainer);
+        this.#enemies.push(this.#runnerFactory.createRunner(600, 100));
+
     }
 
     update(){
         
         this.#hero.update();
+
+
+        for (let enemy of this.#enemies) {
+            enemy.update();
+        }
 
         for (let platform of this.#platforms) {
 
@@ -77,7 +91,15 @@ export default class Game {
                 continue;
             }
 
-            this.checkPlatformCollision(this.#hero, platform)
+            this.checkPlatformCollision(this.#hero, platform);
+
+            for (let enemy of this.#enemies) {
+                if(enemy.isJumpState() && platform.type != "box"){
+                    continue;
+                }
+    
+                this.checkPlatformCollision(enemy, platform);
+            }
         }
 
         this.#camera.update();
@@ -97,7 +119,7 @@ export default class Game {
 
         if (collisionResult.vertical == true){
             character.y = prevPoint.y;
-            this.#hero.stay(platform.y);
+            character.stay(platform.y);
         }
         if (collisionResult.horizontal == true && platform.type == "box"){
             if (platform.isStep){
