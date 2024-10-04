@@ -73,9 +73,19 @@ export default class Runner {
 
         if (this.#velocityY > 0) {
             if (!(this.#state == States.Jump || this.#state == States.FlyDown)) {
-                this.#view.showFall();
+                if(Math.random() > 0.4) {
+                    this.#view.showFall();
+                }
+                else {
+                    this.jump();
+                }
+                
             }
-            this.#state = States.FlyDown
+
+            if(this.#velocityY > 0) {
+                this.#state = States.FlyDown;
+            }
+
         }
 
         this.#velocityY += this.#GRAVITY_FORCE;
@@ -124,6 +134,12 @@ export default class Runner {
 
         if (buttonContext.arrowLeft || buttonContext.arrowRight) {
             this.#view.showRun();
+        }
+    }
+
+    removeFromParent() {
+        if (this.#view.parent != null) {
+            this.#view.removeFromParent();
         }
     }
 

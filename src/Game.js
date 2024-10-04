@@ -22,7 +22,7 @@ export default class Game {
     keyboardProcessor;
 
 
-    constructor(pixiApp){
+    constructor(pixiApp) {
         this.#pixiApp = pixiApp;
 
         this.#worldContainer = new Container();
@@ -35,7 +35,7 @@ export default class Game {
         const platformFactory = new PlatformFactory(this.#worldContainer);
 
         this.#platforms.push(platformFactory.createPlatform(100, 400));
-        this.#platforms.push(platformFactory.createPlatform(300, 400));
+        //this.#platforms.push(platformFactory.createPlatform(300, 400));
         this.#platforms.push(platformFactory.createPlatform(500, 400));
         this.#platforms.push(platformFactory.createPlatform(700, 400));
         this.#platforms.push(platformFactory.createPlatform(1100, 500));
@@ -72,89 +72,103 @@ export default class Game {
         this.#bulletFactory = new BulletFactory();
 
         this.#runnerFactory = new RunnerFactory(this.#worldContainer);
-        this.#enemies.push(this.#runnerFactory.createRunner(600, 100));
+        this.#enemies.push(this.#runnerFactory.createRunner(800, 100));
+        this.#enemies.push(this.#runnerFactory.createRunner(850, 100));
+        this.#enemies.push(this.#runnerFactory.createRunner(900, 100));
 
     }
 
-    update(){
-        
+    update() {
+
         this.#hero.update();
 
 
-        for (let enemy of this.#enemies) {
-            enemy.update();
+        for (let i = 0; i < this.#enemies.length; i++) {
+            this.#enemies[i].update();
+
+            let isDead = false;
+            for (let bullet of this.#bullets) {
+                if (this.isCheckAABB(bullet, this.#enemies[i].collisionBox)) {
+                    isDead = true;
+                    bullet.isDead = true;
+                    break;
+                }
+            }
+
+            this.#checkEnemy(this.#enemies[i], i, isDead);
+
         }
 
         for (let platform of this.#platforms) {
 
-            if(this.#hero.isJumpState() && platform.type != "box"){
+            if (this.#hero.isJumpState() && platform.type != "box") {
                 continue;
             }
 
             this.checkPlatformCollision(this.#hero, platform);
 
             for (let enemy of this.#enemies) {
-                if(enemy.isJumpState() && platform.type != "box"){
+                if (enemy.isJumpState() && platform.type != "box") {
                     continue;
                 }
-    
+
                 this.checkPlatformCollision(enemy, platform);
             }
         }
 
         this.#camera.update();
 
-        for (let i = 0; i < this.#bullets.length; i++){
+        for (let i = 0; i < this.#bullets.length; i++) {
             this.#bullets[i].update();
             this.#checkBulletPosition(this.#bullets[i], i);
         }
 
     }
 
-    checkPlatformCollision(character, platform){
+    checkPlatformCollision(character, platform) {
 
         const prevPoint = character.prevPoint;
 
         const collisionResult = this.getOrientCollisionResult(character.collisionBox, platform, prevPoint)
 
-        if (collisionResult.vertical == true){
+        if (collisionResult.vertical == true) {
             character.y = prevPoint.y;
             character.stay(platform.y);
         }
-        if (collisionResult.horizontal == true && platform.type == "box"){
-            if (platform.isStep){
+        if (collisionResult.horizontal == true && platform.type == "box") {
+            if (platform.isStep) {
                 character.stay(platform.y);
-                
+
             }
-            else{
-               character.x = prevPoint.x; 
+            else {
+                character.x = prevPoint.x;
             }
-            
+
         }
     }
 
-    getOrientCollisionResult(aaRect, bbRect, aaPrevPoint){
+    getOrientCollisionResult(aaRect, bbRect, aaPrevPoint) {
         const collisionResult = {
             horizontal: false,
             vertical: false,
         }
 
-        if (!this.isCheckAABB(aaRect, bbRect)){ 
+        if (!this.isCheckAABB(aaRect, bbRect)) {
             return collisionResult;
-        } 
+        }
 
         aaRect.y = aaPrevPoint.y;
-        if (!this.isCheckAABB(aaRect, bbRect)){
+        if (!this.isCheckAABB(aaRect, bbRect)) {
 
             collisionResult.vertical = true;
             return collisionResult;
-        } 
+        }
 
         collisionResult.horizontal = true;
         return collisionResult;
     }
 
-    isCheckAABB(entity, area){
+    isCheckAABB(entity, area) {
         return (entity.x < area.x + area.width &&
             entity.x + entity.width > area.x &&
             entity.y < area.y + area.height &&
@@ -162,70 +176,70 @@ export default class Game {
     }
 
 
-    isCheckAABB(entity, area){
+    isCheckAABB(entity, area) {
         return (entity.x < area.x + area.width &&
             entity.x + entity.width > area.x &&
             entity.y < area.y + area.height &&
             entity.y + entity.height > area.y);
     }
 
-    setKeys(){
+    setKeys() {
 
-        this.keyboardProcessor.getButton("KeyA").executeDown = function(){
+        this.keyboardProcessor.getButton("KeyA").executeDown = function () {
             const bullet = this.#bulletFactory.createBullet(this.#hero.bulletContext);
             this.#worldContainer.addChild(bullet);
             this.#bullets.push(bullet);
         }
 
-        this.keyboardProcessor.getButton("KeyS").executeDown = function(){
-            if(this.keyboardProcessor.isButtonPressed("ArrowDown") 
-                && !(this.keyboardProcessor.isButtonPressed("ArrowRight") || this.keyboardProcessor.isButtonPressed("ArrowLeft"))){
-                this.#hero.throwDown(); 
+        this.keyboardProcessor.getButton("KeyS").executeDown = function () {
+            if (this.keyboardProcessor.isButtonPressed("ArrowDown")
+                && !(this.keyboardProcessor.isButtonPressed("ArrowRight") || this.keyboardProcessor.isButtonPressed("ArrowLeft"))) {
+                this.#hero.throwDown();
             }
-            else{
-               this.#hero.jump(); 
+            else {
+                this.#hero.jump();
             }
-            
+
         };
 
         const arrowLeft = this.keyboardProcessor.getButton("ArrowLeft");
-        arrowLeft.executeDown = function(){
+        arrowLeft.executeDown = function () {
             this.#hero.startLeftMove();
             this.#hero.setView(this.getArrowButtonContext());
         };
-        arrowLeft.executeUp = function(){
+        arrowLeft.executeUp = function () {
             this.#hero.stopLeftMove();
             this.#hero.setView(this.getArrowButtonContext());
         };
 
         const arrowRight = this.keyboardProcessor.getButton("ArrowRight");
-        arrowRight.executeDown = function(){
+        arrowRight.executeDown = function () {
             this.#hero.startRightMove();
             this.#hero.setView(this.getArrowButtonContext());
         };
-        arrowRight.executeUp = function(){
+        arrowRight.executeUp = function () {
             this.#hero.stopRightMove();
             this.#hero.setView(this.getArrowButtonContext());
         };
 
         const arrowUp = this.keyboardProcessor.getButton("ArrowUp");
-        arrowUp.executeDown = function(){
+        arrowUp.executeDown = function () {
             this.#hero.setView(this.getArrowButtonContext());
         };
-        arrowUp.executeUp = function(){
+        arrowUp.executeUp = function () {
             this.#hero.setView(this.getArrowButtonContext());
         };
 
         const arrowDown = this.keyboardProcessor.getButton("ArrowDown");
-        arrowDown.executeDown = function(){
+        arrowDown.executeDown = function () {
             this.#hero.setView(this.getArrowButtonContext());
         };
-        arrowDown.executeUp = function(){
+        arrowDown.executeUp = function () {
             this.#hero.setView(this.getArrowButtonContext());
         };
     }
 
-    getArrowButtonContext(){
+    getArrowButtonContext() {
         const buttonContext = {};
         buttonContext.arrowLeft = this.keyboardProcessor.isButtonPressed("ArrowLeft");
         buttonContext.arrowRight = this.keyboardProcessor.isButtonPressed("ArrowRight");
@@ -234,16 +248,30 @@ export default class Game {
         return buttonContext;
     }
 
-    #checkBulletPosition(bullet, index){
-        if (bullet.x > (this.#pixiApp.screen.width - this.#worldContainer.x)
+    #checkBulletPosition(bullet, index) {
+        if (bullet.isDead
+            || bullet.x > (this.#pixiApp.screen.width - this.#worldContainer.x)
             || bullet.y > this.#pixiApp.screen.height
             || bullet.x < -this.#worldContainer.x
-            || bullet.y < 0){
+            || bullet.y < 0) {
 
-            if(bullet.parent != null){
-                bullet.removeFromParent(); 
+            if (bullet.parent != null) {
+                bullet.removeFromParent();
             }
-            this.#bullets.splice(index, 1);              
+            this.#bullets.splice(index, 1);
+        }
+    }
+
+    #checkEnemy(enemy, index, isDead) {
+        if (isDead
+            || enemy.x > (this.#pixiApp.screen.width - this.#worldContainer.x)
+            || enemy.y > this.#pixiApp.screen.height
+            || enemy.x < -this.#worldContainer.x
+            || enemy.y < 0) {
+
+            enemy.removeFromParent();
+
+            this.#enemies.splice(index, 1);
         }
     }
 

@@ -5,6 +5,8 @@ export default class Bullet extends Container{
     #SPEED = 10;
     #angle;
 
+    idDead;
+
     constructor(angle){
         super();
 
