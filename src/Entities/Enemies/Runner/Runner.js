@@ -27,7 +27,7 @@ export default class Runner extends Entity {
 
     #state = States.Stay;
 
-    type = "characterEnemy";
+    type = "enemy";
 
     constructor(view) {
         super(view);
@@ -37,6 +37,8 @@ export default class Runner extends Entity {
         this._view.showJump();
 
         this.#movement.x = -1;
+
+        this.gravitable = true;
     }
 
     get prevPoint() {
@@ -70,6 +72,10 @@ export default class Runner extends Entity {
 
         this.#velocityY += this.#GRAVITY_FORCE;
         this.y += this.#velocityY;
+    }
+
+    damage() {
+        this.dead();
     }
 
     stay(platformY) {

@@ -2,10 +2,12 @@ import { Container } from "../lib/pixi.mjs";
 import Camera from "./Camera.js";
 import BulletFactory from "./Entities/Bullets/BulletFactory.js";
 import RunnerFactory from "./Entities/Enemies/Runner/RunnerFactory.js";
+import TourelleFactory from "./Entities/Enemies/Tourelle/TourelleFactory.js";
 import HeroFactory from "./Entities/Hero/HeroFactory.js";
 import PlatformFactory from "./Entities/Platforms/PlatformFactory.js";
 import KeyboardProcessor from "./KeyboardProcessor.js";
 import Physics from "./Physics.js";
+import Weapon from "./Weapon.js";
 
 export default class Game {
 
@@ -14,6 +16,7 @@ export default class Game {
     #platforms = [];
     #entities = [];
     #camera;
+    #weapon;
 
     #bulletFactory;
     #runnerFactory;
@@ -70,10 +73,17 @@ export default class Game {
 
         this.#bulletFactory = new BulletFactory(this.#worldContainer, this.#entities);
 
+        this.#weapon = new Weapon(this.#bulletFactory);
+        this.#weapon.setWeapon(2);
+
         this.#runnerFactory = new RunnerFactory(this.#worldContainer);
         this.#entities.push(this.#runnerFactory.createRunner(800, 100));
         this.#entities.push(this.#runnerFactory.createRunner(850, 100));
         this.#entities.push(this.#runnerFactory.createRunner(900, 100));
+
+        const tourelleFactory = new TourelleFactory(this.#worldContainer, this.#hero, this.#bulletFactory);
+
+        this.#entities.push(tourelleFactory.create(900, 200));
 
     }
 
@@ -82,7 +92,7 @@ export default class Game {
             const entity = this.#entities[i];
             entity.update();
 
-            if (entity.type == "hero" || entity.type == "characterEnemy"){
+            if (entity.type == "hero" || entity.type == "enemy"){
                 this.#checkDamage(entity);
                 this.#checkPlatforms(entity);
             }
@@ -94,13 +104,13 @@ export default class Game {
     }
 
     #checkDamage(entity){
-        const damagers = this.#entities.filter(damager => (entity.type == "characterEnemy" && damager.type == "heroBullet")
-                                                       ||(entity.type == "hero" && (damager.type == "enemyBullet" || damager.type == "characterEnemy")));
+        const damagers = this.#entities.filter(damager => (entity.type == "enemy" && damager.type == "heroBullet")
+                                                       ||(entity.type == "hero" && (damager.type == "enemyBullet" || damager.type == "enemy")));
 
         for (let damager of damagers) {
             if (Physics.isCheckAABB(damager.collisionBox, entity.collisionBox)) {
-                entity.dead();
-                if (damager.type != "characterEnemy"){
+                entity.damage();
+                if (damager.type != "enemy"){
                     damager.dead();
                 }
 
@@ -110,7 +120,7 @@ export default class Game {
     }
 
     #checkPlatforms(character) {
-        if (character.isDead) {
+        if (character.isDead || !character.gravitable) {
             return;
         }
 
@@ -119,6 +129,10 @@ export default class Game {
                 continue;
             }
             this.checkPlatformCollision(character, platform);
+        }
+
+        if(character.type == "hero" && character.x < -this.#worldContainer.x) {
+            character.x = character.prevPoint.x;
         }
     }
 
@@ -147,7 +161,9 @@ export default class Game {
     setKeys() {
 
         this.keyboardProcessor.getButton("KeyA").executeDown = function () {
-            this.#bulletFactory.createBullet(this.#hero.bulletContext);
+            if(!this.#hero.isDead && !this.#hero.isFall) {
+              this.#weapon.fire(this.#hero.bulletContext);  
+            }
         }
 
         this.keyboardProcessor.getButton("KeyS").executeDown = function () {

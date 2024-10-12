@@ -3,6 +3,7 @@ export default class Entity{
     _view;
 
     #isDead;
+    #gravitable = false;
 
     constructor(view){
         this._view = view;
@@ -22,6 +23,14 @@ export default class Entity{
 
     set y(value) {
         this._view.y = value;
+    }
+
+    get gravitable(){
+        return this.#gravitable;
+    }
+
+    set gravitable(value) {
+        this.#gravitable = value;
     }
 
     get collisionBox(){

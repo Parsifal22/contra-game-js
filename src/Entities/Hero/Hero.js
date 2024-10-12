@@ -41,6 +41,8 @@ export default class Hero extends Entity {
 
     type = "hero";
 
+    isFall = false;
+
     constructor(view) {
 
         super(view);
@@ -49,6 +51,8 @@ export default class Hero extends Entity {
 
         this.#state = States.Jump;
         this._view.showJump();
+        
+        this.gravitable = true;
     }
 
     get bulletContext() {
@@ -70,12 +74,17 @@ export default class Hero extends Entity {
         if (this.#velocityY > 0) {
             if (!(this.#state == States.Jump || this.#state == States.FlyDown)) {
                 this._view.showFall();
+                this.isFall = true;
             }
             this.#state = States.FlyDown
         }
 
         this.#velocityY += this.#GRAVITY_FORCE;
         this.y += this.#velocityY;
+    }
+
+    damage() {
+        this.dead();
     }
 
     stay(platformY) {
@@ -88,6 +97,7 @@ export default class Hero extends Entity {
             fakeButtonContext.arrowUp = this.#isStayUp;
             this.#state = States.Stay;
             this.setView(fakeButtonContext);
+            this.isFall = false;
         }
 
         this.#state = States.Stay;
@@ -113,6 +123,7 @@ export default class Hero extends Entity {
     throwDown() {
         this.#state = States.Jump;
         this._view.showFall();
+        this.isFall = true;
     }
 
     startLeftMove() {
