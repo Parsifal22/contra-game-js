@@ -2,17 +2,17 @@ import { Container } from "../lib/pixi.mjs";
 import Camera from "./Camera.js";
 import BulletFactory from "./Entities/Bullets/BulletFactory.js";
 import RunnerFactory from "./Entities/Enemies/Runner/RunnerFactory.js";
-import Hero from "./Entities/Hero/Hero.js"
+import HeroFactory from "./Entities/Hero/HeroFactory.js";
 import PlatformFactory from "./Entities/Platforms/PlatformFactory.js";
 import KeyboardProcessor from "./KeyboardProcessor.js";
+import Physics from "./Physics.js";
 
 export default class Game {
 
     #pixiApp;
     #hero;
     #platforms = [];
-    #bullets = [];
-    #enemies = [];
+    #entities = [];
     #camera;
 
     #bulletFactory;
@@ -28,14 +28,13 @@ export default class Game {
         this.#worldContainer = new Container();
         this.#pixiApp.stage.addChild(this.#worldContainer);
 
-        this.#hero = new Hero(this.#worldContainer);
-        this.#hero.x = 100;
-        this.#hero.y = 50;
+        const heroFactory = new HeroFactory(this.#worldContainer);
+        this.#hero = heroFactory.createHero(100, 100);
 
+        this.#entities.push(this.#hero);
         const platformFactory = new PlatformFactory(this.#worldContainer);
 
         this.#platforms.push(platformFactory.createPlatform(100, 400));
-        //this.#platforms.push(platformFactory.createPlatform(300, 400));
         this.#platforms.push(platformFactory.createPlatform(500, 400));
         this.#platforms.push(platformFactory.createPlatform(700, 400));
         this.#platforms.push(platformFactory.createPlatform(1100, 500));
@@ -69,67 +68,65 @@ export default class Game {
         }
         this.#camera = new Camera(cameraSettings);
 
-        this.#bulletFactory = new BulletFactory();
+        this.#bulletFactory = new BulletFactory(this.#worldContainer, this.#entities);
 
         this.#runnerFactory = new RunnerFactory(this.#worldContainer);
-        this.#enemies.push(this.#runnerFactory.createRunner(800, 100));
-        this.#enemies.push(this.#runnerFactory.createRunner(850, 100));
-        this.#enemies.push(this.#runnerFactory.createRunner(900, 100));
+        this.#entities.push(this.#runnerFactory.createRunner(800, 100));
+        this.#entities.push(this.#runnerFactory.createRunner(850, 100));
+        this.#entities.push(this.#runnerFactory.createRunner(900, 100));
 
     }
 
     update() {
+        for(let i = 0; i < this.#entities.length; i++) {
+            const entity = this.#entities[i];
+            entity.update();
 
-        this.#hero.update();
-
-
-        for (let i = 0; i < this.#enemies.length; i++) {
-            this.#enemies[i].update();
-
-            let isDead = false;
-            for (let bullet of this.#bullets) {
-                if (this.isCheckAABB(bullet, this.#enemies[i].collisionBox)) {
-                    isDead = true;
-                    bullet.isDead = true;
-                    break;
-                }
+            if (entity.type == "hero" || entity.type == "characterEnemy"){
+                this.#checkDamage(entity);
+                this.#checkPlatforms(entity);
             }
 
-            this.#checkEnemy(this.#enemies[i], i, isDead);
-
-        }
-
-        for (let platform of this.#platforms) {
-
-            if (this.#hero.isJumpState() && platform.type != "box") {
-                continue;
-            }
-
-            this.checkPlatformCollision(this.#hero, platform);
-
-            for (let enemy of this.#enemies) {
-                if (enemy.isJumpState() && platform.type != "box") {
-                    continue;
-                }
-
-                this.checkPlatformCollision(enemy, platform);
-            }
+            this.#checkEntityStatus(entity, i);
         }
 
         this.#camera.update();
+    }
 
-        for (let i = 0; i < this.#bullets.length; i++) {
-            this.#bullets[i].update();
-            this.#checkBulletPosition(this.#bullets[i], i);
+    #checkDamage(entity){
+        const damagers = this.#entities.filter(damager => (entity.type == "characterEnemy" && damager.type == "heroBullet")
+                                                       ||(entity.type == "hero" && (damager.type == "enemyBullet" || damager.type == "characterEnemy")));
+
+        for (let damager of damagers) {
+            if (Physics.isCheckAABB(damager.collisionBox, entity.collisionBox)) {
+                entity.dead();
+                if (damager.type != "characterEnemy"){
+                    damager.dead();
+                }
+
+                break;
+            }
+        }
+    }
+
+    #checkPlatforms(character) {
+        if (character.isDead) {
+            return;
         }
 
+        for (let platform  of this.#platforms) {
+            if (character.isJumpState() && platform.type != "box") {
+                continue;
+            }
+            this.checkPlatformCollision(character, platform);
+        }
     }
 
     checkPlatformCollision(character, platform) {
 
         const prevPoint = character.prevPoint;
 
-        const collisionResult = this.getOrientCollisionResult(character.collisionBox, platform, prevPoint)
+        const collisionResult = Physics.getOrientCollisionResult(character.collisionBox, platform, prevPoint)
 
         if (collisionResult.vertical == true) {
             character.y = prevPoint.y;
@@ -147,48 +144,10 @@ export default class Game {
         }
     }
 
-    getOrientCollisionResult(aaRect, bbRect, aaPrevPoint) {
-        const collisionResult = {
-            horizontal: false,
-            vertical: false,
-        }
-
-        if (!this.isCheckAABB(aaRect, bbRect)) {
-            return collisionResult;
-        }
-
-        aaRect.y = aaPrevPoint.y;
-        if (!this.isCheckAABB(aaRect, bbRect)) {
-
-            collisionResult.vertical = true;
-            return collisionResult;
-        }
-
-        collisionResult.horizontal = true;
-        return collisionResult;
-    }
-
-    isCheckAABB(entity, area) {
-        return (entity.x < area.x + area.width &&
-            entity.x + entity.width > area.x &&
-            entity.y < area.y + area.height &&
-            entity.y + entity.height > area.y);
-    }
-
-
-    isCheckAABB(entity, area) {
-        return (entity.x < area.x + area.width &&
-            entity.x + entity.width > area.x &&
-            entity.y < area.y + area.height &&
-            entity.y + entity.height > area.y);
-    }
-
     setKeys() {
 
         this.keyboardProcessor.getButton("KeyA").executeDown = function () {
-            const bullet = this.#bulletFactory.createBullet(this.#hero.bulletContext);
-            this.#worldContainer.addChild(bullet);
-            this.#bullets.push(bullet);
+            this.#bulletFactory.createBullet(this.#hero.bulletContext);
         }
 
         this.keyboardProcessor.getButton("KeyS").executeDown = function () {
@@ -248,31 +207,18 @@ export default class Game {
         return buttonContext;
     }
 
-    #checkBulletPosition(bullet, index) {
-        if (bullet.isDead
-            || bullet.x > (this.#pixiApp.screen.width - this.#worldContainer.x)
-            || bullet.y > this.#pixiApp.screen.height
-            || bullet.x < -this.#worldContainer.x
-            || bullet.y < 0) {
-
-            if (bullet.parent != null) {
-                bullet.removeFromParent();
-            }
-            this.#bullets.splice(index, 1);
+    #checkEntityStatus(entity, index) {
+        if(entity.isDead || this.#isScreenOut(entity)){
+            entity.removeFromStage();
+            this.#entities.splice(index, 1);
         }
     }
 
-    #checkEnemy(enemy, index, isDead) {
-        if (isDead
-            || enemy.x > (this.#pixiApp.screen.width - this.#worldContainer.x)
-            || enemy.y > this.#pixiApp.screen.height
-            || enemy.x < -this.#worldContainer.x
-            || enemy.y < 0) {
-
-            enemy.removeFromParent();
-
-            this.#enemies.splice(index, 1);
-        }
+    #isScreenOut(entity) {
+        return (entity.x > (this.#pixiApp.screen.width - this.#worldContainer.x)
+                || entity.y > this.#pixiApp.screen.height
+                || entity.x < (-this.#worldContainer.x)
+                || entity.y < 0)
     }
 
 }
