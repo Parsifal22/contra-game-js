@@ -14,6 +14,15 @@ export default class HeroView extends Container {
         height: 0,
     }
 
+    #hitBox = {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+        shiftX: 0,
+        shiftY: 0,
+    }
+
     #stm = {
         currentState: "default",
         states: {},
@@ -58,6 +67,12 @@ export default class HeroView extends Container {
         return this.#collisionBox;
     }
 
+    get hitBox() {
+        this.#hitBox.x = this.x + this.#hitBox.shiftX;
+        this.#hitBox.y = this.y + this.#hitBox.shiftY;
+        return this.#hitBox;
+    }
+
     get isFliped() {
         return this.#rootNode.scale.x == -1;
     }
@@ -69,40 +84,80 @@ export default class HeroView extends Container {
     showStay() {
         this.#toState("stay");
         this.#setBulletPointShift(65, 30);
+
+        this.#hitBox.width = 20;
+        this.#hitBox.height = 90;
+        this.#hitBox.shiftX = 0;
+        this.#hitBox.shiftY = 0;
     }
 
     showStayUp() {
         this.#toState("stayUp");
         this.#setBulletPointShift(-2, -40);
+
+        this.#hitBox.width = 20;
+        this.#hitBox.height = 90;
+        this.#hitBox.shiftX = 0;
+        this.#hitBox.shiftY = 0;
     }
 
     showRun() {
         this.#toState("run");
         this.#setBulletPointShift(65, 30);
+
+        this.#hitBox.width = 20;
+        this.#hitBox.height = 90;
+        this.#hitBox.shiftX = 0;
+        this.#hitBox.shiftY = 0;
     }
 
     showRunUp() {
         this.#toState("runUp");
         this.#setBulletPointShift(40, -20);
+
+        this.#hitBox.width = 20;
+        this.#hitBox.height = 90;
+        this.#hitBox.shiftX = 0;
+        this.#hitBox.shiftY = 0;
     }
 
     showRunDown() {
         this.#toState("runDown");
         this.#setBulletPointShift(20, 55);
+
+        this.#hitBox.width = 20;
+        this.#hitBox.height = 90;
+        this.#hitBox.shiftX = 0;
+        this.#hitBox.shiftY = 0;
     }
 
     showLay() {
         this.#toState("lay");
         this.#setBulletPointShift(65, 70);
+
+        this.#hitBox.width = 90;
+        this.#hitBox.height = 20;
+        this.#hitBox.shiftX = -45;
+        this.#hitBox.shiftY = 70;
     }
 
     showJump() {
         this.#toState("jump");
         this.#setBulletPointShift(-2, 40);
+
+        this.#hitBox.width = 40;
+        this.#hitBox.height = 40;
+        this.#hitBox.shiftX = -10;
+        this.#hitBox.shiftY = 25;
     }
 
     showFall() {
         this.#toState("fall");
+
+        this.#hitBox.width = 20;
+        this.#hitBox.height = 90;
+        this.#hitBox.shiftX = 0;
+        this.#hitBox.shiftY = 0;
     }
 
     flip(direction) {

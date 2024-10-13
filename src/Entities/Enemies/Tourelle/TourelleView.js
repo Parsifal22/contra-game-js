@@ -49,4 +49,8 @@ export default class TourelleView extends Container {
         this.#collisionBox.y = this.y - this.#collisionBox.height/2;
         return this.#collisionBox;
     }
+
+    get hitBox() {
+        return this.collisionBox;
+    }
 }

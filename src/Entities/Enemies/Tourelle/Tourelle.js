@@ -14,11 +14,20 @@ export default class Tourelle extends Entity {
 
         this.#target = target;
         this.#bulletFactory = bulletFactory;
+
+        this.isActive = false;
     }
 
     update() {
 
         if (this.#target.isDead) {
+            return;
+        }
+
+        if(!this.isActive){
+            if(this.x - this.#target.x < 512 + this.collisionBox.width*2) {
+                this.isActive = true;
+            }
             return;
         }
 

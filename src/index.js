@@ -7,7 +7,9 @@ const pixiApp = new PIXI.Application({
 });
 const game = new Game(pixiApp);
 
-document.body.appendChild(pixiApp.renderer.view);
+const gameContainer = document.getElementById("game-container");
+gameContainer.appendChild(pixiApp.renderer.view);
+
 document.addEventListener("keydown", key => game.keyboardProcessor.onKeyDown(key));
 document.addEventListener("keyup", key => game.keyboardProcessor.onKeyUp(key));
 
