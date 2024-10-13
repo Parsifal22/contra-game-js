@@ -11,3 +11,36 @@ body {
     transform: translate(-50%, -50%);
     border: 1px solid black;
 }
+
+.source-code {
+    position: fixed;
+    top: 80%;
+    z-index: 101;
+    transform: translateX(-30%);
+    left: 50%;
+    
+}
+
+.source-code .source-code-box {
+    cursor: pointer;
+    position: relative;
+    width: 100%;
+    transition: .2s;
+  
+}
+
+.source-code .source-code-box a {
+    width: 50%;
+    line-height: 60px;
+    text-align: center;
+    font-size: 30px;
+    z-index: 1;
+    text-decoration: none;
+    color: inherit;
+  }
+
+.source-code .source-code-box a:hover {
+    transform: scale(1.25);
+}
+  
+  
