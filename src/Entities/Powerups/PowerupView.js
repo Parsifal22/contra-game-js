@@ -1,4 +1,4 @@
-import { Container, Sprite } from "../../../lib/pixi.mjs";
+import { AnimatedSprite, Container, Sprite } from "../../../lib/pixi.mjs";
 
 export default class PowerupView extends Container {
 
@@ -9,11 +9,15 @@ export default class PowerupView extends Container {
         height: 0,
     }
 
+    #view;
+    #assets;
     constructor(assets) {
         super();
 
-        const view = new Sprite(assets.getTexture("powerup0000"));
-        this.addChild(view);
+        this.#assets = assets;
+
+        this.#view = new Sprite(assets.getTexture("powerup0000"));
+        this.addChild(this.#view);
 
         this.#collisionBox.width = 50;
         this.#collisionBox.height = 20;
@@ -27,6 +31,23 @@ export default class PowerupView extends Container {
 
     get hitBox() {
         return this.collisionBox;
+    }
+
+    showAndGetDeadAnimation(){
+        this.#view.visible = false;
+        this.#collisionBox.width = 0;
+        this.#collisionBox.height = 0;
+
+        const explosion = new AnimatedSprite(this.#assets.getAnimationTextures("explosion"));
+        explosion.animationSpeed = 1/5;
+        explosion.scale.x = 2;
+        explosion.scale.y = 2;
+        explosion.y = -explosion.height/2;
+        explosion.loop = false;
+        explosion.play();
+        this.addChild(explosion);
+
+        return explosion;
     }
 
 }

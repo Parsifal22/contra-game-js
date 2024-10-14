@@ -1,3 +1,4 @@
+import { Text, TextStyle } from "../lib/pixi.mjs";
 import Camera from "./Camera.js";
 import BulletFactory from "./Entities/Bullets/BulletFactory.js";
 import EnemiesFactory from "./Entities/Enemies/EnemiesFactory.js";
@@ -18,6 +19,7 @@ export default class Game {
     #entities = [];
     #camera;
     #weapon;
+    #isEndGame = false;
 
     #bulletFactory;
     #worldContainer
@@ -79,8 +81,55 @@ export default class Game {
 
         this.#camera.update();
         this.#weapon.update(this.#hero.bulletContext);
+
+        this.#checkGameStatus();
+
     }
 
+
+    #checkGameStatus(){
+
+        if(this.#isEndGame){
+            return;
+        }
+
+        const isBossDead = this.#entities.some(e => e.isBoss && !e.isActive);
+        if(isBossDead){
+            const enemies = this.#entities.filter(e => e.type == "enemy" && !e.isBoss);
+            enemies.forEach(e => e.dead());
+            this.#isEndGame = true;
+            this.#showEndGame();
+        }
+
+        const isHeroDead = !this.#entities.some(e => e.type == "hero") && this.#hero.isDead;
+        if(isHeroDead){
+            this.#entities.push(this.#hero);
+            this.#worldContainer.game.addChild(this.#hero._view);
+            this.#hero.reset();
+            this.#hero.x = -this.#worldContainer.x + 160;
+            this.#hero.y = 100;
+            this.#weapon.setWeapon(1);
+        }
+    }
+
+    #showEndGame(){
+        const style = new TextStyle({
+            fontFamily: "Impact",
+            fontSize: 50,
+            fill: [0xffffff, 0xdd0000],
+            stroke: 0x000000,
+            strokeThickness: 5,
+            letterSpacing: 30,
+        })
+    
+        const text = new Text("STAGE CLEAR", style);
+        text.x = this.#pixiApp.screen.width/2 - text.width/2;
+        text.y = this.#pixiApp.screen.height/2 - text.height/2;
+    
+        this.#pixiApp.stage.addChild(text);
+   
+    }
+    
     #checkDamage(entity){
         const damagers = this.#entities.filter(damager => ((entity.type == "enemy" || entity.type == "powerupBox") && damager.type == "heroBullet")
                                                        ||(entity.type == "hero" && (damager.type == "enemyBullet" || damager.type == "enemy")));
@@ -134,7 +183,7 @@ export default class Game {
             character.y = prevPoint.y;
             character.stay(platform.y);
         }
-        if (collisionResult.horizontal == true && platform.type == "box") {
+        if (collisionResult.horizontal == true && platform.type == "box" && !character.isForbiddenHorizontalCollision) {
             if (platform.isStep) {
                 character.stay(platform.y);
 

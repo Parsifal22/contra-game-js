@@ -1,9 +1,9 @@
 import { AnimatedSprite, Container, Graphics, Sprite } from "../../../../lib/pixi.mjs";
 
-export default class TourelleView extends Container {
+export default class BossGunView extends Container {
 
-    #gunView;
     #assets;
+    #view;
 
     #collisionBox = {
         x:0,
@@ -17,7 +17,7 @@ export default class TourelleView extends Container {
         super();
 
         this.#assets = assets;
-        const view = new Sprite(this.#assets.getTexture("tourelle0000"));
+        const view = new Sprite(this.#assets.getTexture("bossgun0000"));
         view.scale.x = 1.4;
         view.scale.y = 1.4;
         view.x -= view.width/2;
@@ -25,24 +25,11 @@ export default class TourelleView extends Container {
 
         this.addChild(view);
 
-        this.#gunView = new Sprite(this.#assets.getTexture("tourellegun0000"));
-        this.#gunView.pivot.x = 22;
-        this.#gunView.pivot.y = 19;
-        this.#gunView.x = view.width/2 - 17;
-        this.#gunView.y = view.width/2 - 15;
+        this.#view = view;
 
-        this.#collisionBox.width = 128;
-        this.#collisionBox.height = 128;
+        this.#collisionBox.width = 38;
+        this.#collisionBox.height = 18;
 
-        view.addChild(this.#gunView);
-    }
-
-    get gunRotation(){
-        return this.#gunView.rotation;
-    }
-
-    set gunRotation(value) {
-        this.#gunView.rotation = value;
     }
 
     get collisionBox() {
@@ -56,7 +43,7 @@ export default class TourelleView extends Container {
     }
 
     showAndGetDeadAnimation(){
-        this.#gunView.visible = false;
+        this.#view.visible = false;
         this.#collisionBox.width = 0;
         this.#collisionBox.height = 0;
 

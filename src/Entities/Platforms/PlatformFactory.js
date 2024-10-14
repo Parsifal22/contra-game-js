@@ -99,7 +99,7 @@ export default class PlatformFactory {
         const view = new PlatformView(this.#platformWidth, this.#platformHeight);
         view.addChild(skin);
 
-        const box = new BridgePlatform(view);
+        const box = new BridgePlatform(view, this.#assets);
         box.x = x;
         box.y = y;
         box.type = "box";

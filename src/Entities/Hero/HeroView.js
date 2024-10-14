@@ -6,14 +6,12 @@ export default class HeroView extends Container {
         width: 0,
         height: 0,
     }
-
     #collisionBox = {
         x: 0,
         y: 0,
         width: 0,
         height: 0,
     }
-
     #hitBox = {
         x: 0,
         y: 0,
@@ -22,15 +20,14 @@ export default class HeroView extends Container {
         shiftX: 0,
         shiftY: 0,
     }
-
     #stm = {
         currentState: "default",
-        states: {},
+        states: {}
     }
 
     #bulletPointShift = {
-        x: 0,
-        y: 0,
+        x:0,
+        y:0,
     }
 
     #rootNode;
@@ -42,12 +39,11 @@ export default class HeroView extends Container {
         this.#assets = assets;
 
         this.#createNodeStructure();
+
         this.#rootNode.pivot.x = 10;
         this.#rootNode.x = 10;
-
         this.#bounds.width = 20;
         this.#bounds.height = 90;
-
         this.#collisionBox.width = this.#bounds.width;
         this.#collisionBox.height = this.#bounds.height;
 
@@ -62,7 +58,7 @@ export default class HeroView extends Container {
         this.#stm.states.fall = this.#getFallImage();
 
         for (let key in this.#stm.states) {
-            this.#rootNode.addChild(this.#stm.states[key]);
+            this.#rootNode.addChild(this.#stm.states[key])
         }
     }
 
@@ -78,14 +74,35 @@ export default class HeroView extends Container {
         return this.#hitBox;
     }
 
-    get isFliped() {
+    get isFliped(){
         return this.#rootNode.scale.x == -1;
     }
 
-    get bulletPointShift() {
+    get bulletPointShift(){
         return this.#bulletPointShift;
     }
 
+    reset(){
+        this.#rootNode.visible = true;
+        this.#collisionBox.width = this.#bounds.width;
+        this.#collisionBox.height = this.#bounds.height;
+    }
+
+    showAndGetDeadAnimation(){
+        this.#rootNode.visible = false;
+        this.#collisionBox.width = 0;
+        this.#collisionBox.height = 0;
+
+        const explosion = new AnimatedSprite(this.#assets.getAnimationTextures("explosion"));
+        explosion.animationSpeed = 1/5;
+        explosion.x = -explosion.width/2;
+        explosion.loop = false;
+        explosion.play();
+        this.addChild(explosion);
+
+        return explosion;
+    }
+    
     showStay() {
         this.#toState("stay");
         this.#setBulletPointShift(50, 29);
@@ -184,18 +201,14 @@ export default class HeroView extends Container {
     }
 
     #toState(key) {
-
         if (this.#stm.currentState == key) {
             return;
         }
-
         for (let key in this.#stm.states) {
             this.#stm.states[key].visible = false;
         }
-
         this.#stm.states[key].visible = true;
         this.#stm.currentState = key;
-
     }
 
     #createNodeStructure() {
@@ -204,7 +217,7 @@ export default class HeroView extends Container {
         this.#rootNode = rootNode;
     }
 
-    #setBulletPointShift(x, y) {
+    #setBulletPointShift(x, y){
         this.#bulletPointShift.x = (x + this.#rootNode.pivot.x * this.#rootNode.scale.x) * this.#rootNode.scale.x;
         this.#bulletPointShift.y = y;
     }
@@ -223,7 +236,6 @@ export default class HeroView extends Container {
 
     #getRunImage() {
         const view = new AnimatedSprite(this.#assets.getAnimationTextures("run"));
-
         view.animationSpeed = 1 / 10;
         view.play();
         view.y -= 3;
@@ -240,32 +252,31 @@ export default class HeroView extends Container {
 
         const upperPartMask = new Graphics();
         upperPartMask.beginFill(0xffffff);
-        upperPartMask.drawRect(0, 0, 100, 45);
+        upperPartMask.drawRect(0,0,100,45);
 
         upperPart.mask = upperPartMask;
 
-        const buttomPart = new AnimatedSprite(this.#assets.getAnimationTextures("run"));
-        buttomPart.animationSpeed = 1 / 10;
-        buttomPart.play();
-        buttomPart.y -= 3;
+        const bottomPart = new AnimatedSprite(this.#assets.getAnimationTextures("run"));
+        bottomPart.animationSpeed = 1 / 10;
+        bottomPart.play();
+        bottomPart.y -= 3;
 
-        const buttomPartMask = new Graphics();
-        buttomPartMask.beginFill(0xffffff);
-        buttomPartMask.drawRect(0, 45, 100, 45);
+        const bottomPartMask = new Graphics();
+        bottomPartMask.beginFill(0xffffff);
+        bottomPartMask.drawRect(0,45,100,45);
 
-        buttomPart.mask = buttomPartMask;
+        bottomPart.mask = bottomPartMask;
 
         container.addChild(upperPart);
-        container.addChild(buttomPart);
+        container.addChild(bottomPart);
         container.addChild(upperPartMask);
-        container.addChild(buttomPartMask);
+        container.addChild(bottomPartMask);
 
         return container;
     }
 
     #getRunUpImage() {
         const view = new AnimatedSprite(this.#assets.getAnimationTextures("runup"));
-        
         view.animationSpeed = 1 / 10;
         view.play();
         view.y -= 3;
@@ -274,7 +285,6 @@ export default class HeroView extends Container {
 
     #getRunDownImage() {
         const view = new AnimatedSprite(this.#assets.getAnimationTextures("rundown"));
-        
         view.animationSpeed = 1 / 10;
         view.play();
         view.y -= 3;
@@ -290,7 +300,6 @@ export default class HeroView extends Container {
 
     #getJumpImage() {
         const view = new AnimatedSprite(this.#assets.getAnimationTextures("jump"));
-        
         view.animationSpeed = 1 / 10;
         view.play();
         view.y -= 3;
@@ -302,5 +311,4 @@ export default class HeroView extends Container {
         const view = new Sprite(this.#assets.getTexture("run0003"));
         return view;
     }
-
 }
