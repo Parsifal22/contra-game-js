@@ -48,3 +48,21 @@ body {
 }
   
   
+.rules-container {
+    position: absolute;
+    width: 10%;
+    margin: 0 auto;
+    top: 50%; /* Moves the element 50% from the top */
+    left: 20%;
+    margin: auto; /* Centers the container horizontally */
+}
+
+.rules-container p {
+    font-size: 24px;
+    color: #00ff00;
+    text-shadow: 
+        0 0 5px #00ff00,
+        0 0 10px #00ff00,
+        0 0 15px #ff00ff,
+        0 0 20px #ff00ff; 
+}
