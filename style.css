@@ -1,5 +1,8 @@
 body {
     background-color: rgba(36, 29, 29, 0.183);
+    background-image: url('img/background.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 #game-container {
@@ -14,10 +17,10 @@ body {
 
 .source-code {
     position: fixed;
-    top: 80%;
-    z-index: 101;
-    transform: translateX(-30%);
+    top: 15%;
     left: 50%;
+    z-index: 101;
+    transform: translateX(-30%);   
     
 }
 
@@ -33,12 +36,13 @@ body {
     width: 50%;
     line-height: 60px;
     text-align: center;
-    font-size: 30px;
+    font-size: 80px;
     z-index: 1;
     text-decoration: none;
-    color: inherit;
+    color: rgb(123, 29, 190);
+    text-shadow: 0 0 10px rgb(123, 29, 190), 0 0 20px rgb(123, 29, 190), 0 0 30px rgb(123, 29, 190);
   }
-
+  
 .source-code .source-code-box a:hover {
     transform: scale(1.25);
 }

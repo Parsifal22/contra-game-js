@@ -1,8 +1,9 @@
-import { Container, Graphics } from "../../../../lib/pixi.mjs";
+import { Container, Graphics, Sprite } from "../../../../lib/pixi.mjs";
 
 export default class TourelleView extends Container {
 
     #gunView;
+    #asserts;
 
     #collisionBox = {
         x:0,
@@ -12,28 +13,28 @@ export default class TourelleView extends Container {
     }
 
 
-    constructor() {
+    constructor(asserts) {
         super();
 
-        const view = new Graphics();
-        view.lineStyle(2, 0xff0000);
-        view.drawCircle(0, 0, 50);
+        this.#asserts = asserts;
+        const view = new Sprite(this.#asserts.getTexture("tourelle0000"));
+        view.scale.x = 1.4;
+        view.scale.y = 1.4;
+        view.x -= view.width/2;
+        view.y -= view.height/2;
 
         this.addChild(view);
 
-        this.#gunView = new Graphics();
-        this.#gunView.lineStyle(2, 0xff0000);
-        this.#gunView.drawRect(0, 0, 70, 10);
-        this.#gunView.pivot.x = 5;
-        this.#gunView.pivot.y = 5;
+        this.#gunView = new Sprite(this.#asserts.getTexture("tourellegun0000"));
+        this.#gunView.pivot.x = 22;
+        this.#gunView.pivot.y = 19;
+        this.#gunView.x = view.width/2 - 17;
+        this.#gunView.y = view.width/2 - 15;
 
-        this.#gunView.x = 0;
-        this.#gunView.y = 0;
+        this.#collisionBox.width = 128;
+        this.#collisionBox.height = 128;
 
-        this.#collisionBox.width = 100;
-        this.#collisionBox.height = 100;
-
-        this.addChild(this.#gunView);
+        view.addChild(this.#gunView);
     }
 
     get gunRotation(){

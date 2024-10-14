@@ -3,6 +3,7 @@ import BulletFactory from "./Entities/Bullets/BulletFactory.js";
 import EnemiesFactory from "./Entities/Enemies/EnemiesFactory.js";
 import HeroFactory from "./Entities/Hero/HeroFactory.js";
 import PlatformFactory from "./Entities/Platforms/PlatformFactory.js";
+import PowerupsFactory from "./Entities/Powerups/PowerupsFactory.js";
 import KeyboardProcessor from "./KeyboardProcessor.js";
 import Physics from "./Physics.js";
 import SceneFactory from "./SceneFactory.js";
@@ -19,29 +20,30 @@ export default class Game {
     #weapon;
 
     #bulletFactory;
-    #runnerFactory;
-
     #worldContainer
     keyboardProcessor;
 
 
-    constructor(pixiApp) {
+    constructor(pixiApp, assets) {
         this.#pixiApp = pixiApp;
 
         this.#worldContainer = new World();
         this.#pixiApp.stage.addChild(this.#worldContainer);
 
-        const heroFactory = new HeroFactory(this.#worldContainer.game);
+        const heroFactory = new HeroFactory(this.#worldContainer.game, assets);
         this.#hero = heroFactory.createHero(160, 100);
 
         this.#bulletFactory = new BulletFactory(this.#worldContainer.game, this.#entities);
 
-        const enemyFactory = new EnemiesFactory(this.#worldContainer.game, this.#hero, this.#bulletFactory, this.#entities);
+        const enemyFactory = new EnemiesFactory(this.#worldContainer.game, this.#hero, this.#bulletFactory, this.#entities, assets);
 
         this.#entities.push(this.#hero);
-        const platformFactory = new PlatformFactory(this.#worldContainer);
+        const platformFactory = new PlatformFactory(this.#worldContainer, assets);
+
+        const powerupFactory = new PowerupsFactory(this.#entities, assets, this.#worldContainer.game, this.#hero);
+        powerupFactory.createPowerup();
         
-        const sceneFactory = new SceneFactory(this.#platforms, this.#entities, platformFactory, enemyFactory, this.#hero);
+        const sceneFactory = new SceneFactory(this.#platforms, this.#entities, platformFactory, enemyFactory, this.#hero, powerupFactory);
         sceneFactory.createScene();
 
         this.keyboardProcessor = new KeyboardProcessor(this);
@@ -67,7 +69,7 @@ export default class Game {
             const entity = this.#entities[i];
             entity.update();
 
-            if (entity.type == "hero" || entity.type == "enemy"){
+            if (entity.type == "hero" || entity.type == "enemy" || entity.type == "powerupBox" || entity.type == "spreadgunPowerup"){
                 this.#checkDamage(entity);
                 this.#checkPlatforms(entity);
             }
@@ -76,10 +78,11 @@ export default class Game {
         }
 
         this.#camera.update();
+        this.#weapon.update(this.#hero.bulletContext);
     }
 
     #checkDamage(entity){
-        const damagers = this.#entities.filter(damager => (entity.type == "enemy" && damager.type == "heroBullet")
+        const damagers = this.#entities.filter(damager => ((entity.type == "enemy" || entity.type == "powerupBox") && damager.type == "heroBullet")
                                                        ||(entity.type == "hero" && (damager.type == "enemyBullet" || damager.type == "enemy")));
 
         for (let damager of damagers) {
@@ -91,6 +94,16 @@ export default class Game {
 
                 break;
             }
+        }
+
+        const powerups = this.#entities.filter(powerup => powerup.type == "spreadgunPowerup" && entity.type == "hero");
+        for (let powerup of powerups) {
+            if (Physics.isCheckAABB(powerup.hitBox, entity.hitBox)) {
+            powerup.damage();
+            this.#weapon.setWeapon(powerup.powerupType);
+            break; 
+            }
+
         }
     }
 
@@ -137,9 +150,22 @@ export default class Game {
 
         this.keyboardProcessor.getButton("KeyA").executeDown = function () {
             if(!this.#hero.isDead && !this.#hero.isFall) {
-              this.#weapon.fire(this.#hero.bulletContext);  
+            const bulllets = this.#entities.filter(bullet => bullet.type == this.#hero.bulletContext.type);
+            if (bulllets.length > 30) {
+                return;
+            }
+            this.#weapon.startFire();
+            this.#hero.setView(this.getArrowButtonContext());  
             }
         }
+
+        this.keyboardProcessor.getButton("KeyA").executeUp = function () {
+            if(!this.#hero.isDead && !this.#hero.isFall) {
+                this.#weapon.stopFire();
+              this.#hero.setView(this.getArrowButtonContext());  
+            }
+        }
+
 
         this.keyboardProcessor.getButton("KeyS").executeDown = function () {
             if (this.keyboardProcessor.isButtonPressed("ArrowDown")
@@ -195,6 +221,7 @@ export default class Game {
         buttonContext.arrowRight = this.keyboardProcessor.isButtonPressed("ArrowRight");
         buttonContext.arrowUp = this.keyboardProcessor.isButtonPressed("ArrowUp");
         buttonContext.arrowDown = this.keyboardProcessor.isButtonPressed("ArrowDown");
+        buttonContext.shoot = this.keyboardProcessor.isButtonPressed("KeyA");
         return buttonContext;
     }
 

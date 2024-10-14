@@ -2,7 +2,7 @@ import Entity from "../Entity.js";
 
 export default class Bullet extends Entity {
 
-    #SPEED = 10;
+    speed = 10;
     #angle;
 
     type;
@@ -15,7 +15,7 @@ export default class Bullet extends Entity {
     }
 
     update(){
-        this.x += this.#SPEED * Math.cos(this.#angle);
-        this.y += this.#SPEED * Math.sin(this.#angle);
+        this.x += this.speed * Math.cos(this.#angle);
+        this.y += this.speed * Math.sin(this.#angle);
     }
 }

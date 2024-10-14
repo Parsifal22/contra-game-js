@@ -6,15 +6,17 @@ export default class SceneFactory {
 
     #entities;
     #target;
+    #powerupFactory;
 
     #blockSize = 128;
 
-    constructor(platforms, entities, platformsFactory, enemyFactory, target) {
+    constructor(platforms, entities, platformsFactory, enemyFactory, target, powerupFactory) {
         this.#platforms = platforms;
         this.#entities = entities;
         this.#platformsFactory = platformsFactory;
         this.#enemyFactory = enemyFactory;
         this.#target = target;
+        this.#powerupFactory = powerupFactory;
     }
 
     createScene() {
@@ -22,6 +24,7 @@ export default class SceneFactory {
         this.#createGround();
         this.#createWater();
         this.#createBossWall();
+        this.#createPowerups();
 
         this.#createEnemies();
         this.#createInteractive();
@@ -128,5 +131,11 @@ export default class SceneFactory {
         this.#enemyFactory.createTourelle(this.#blockSize * 35 + 64, 550);
         this.#enemyFactory.createTourelle(this.#blockSize * 45 + 64, 670);
         this.#enemyFactory.createTourelle(this.#blockSize * 48 + 64, 670);
+    }
+
+    #createPowerups() {
+        this.#powerupFactory.createPowerup(this.#blockSize*5, 150);
+        this.#powerupFactory.createPowerup(this.#blockSize*15, 150);
+        this.#powerupFactory.createPowerup(this.#blockSize*25, 150);
     }
 }

@@ -3,13 +3,15 @@ import HeroView from "./HeroView.js";
 
 export default class HeroFactory {
     #worldContainer;
+    #assets
 
-    constructor(worldContainer) {
+    constructor(worldContainer, assets) {
         this.#worldContainer = worldContainer;
+        this.#assets = assets;
     }
 
     createHero(x, y) {
-        const heroView = new HeroView();
+        const heroView = new HeroView(this.#assets);
 
         this,this.#worldContainer.addChild(heroView);
 
