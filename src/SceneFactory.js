@@ -20,6 +20,7 @@ export default class SceneFactory {
     }
 
     createScene() {
+        this.#createDecoration();
         this.#createPlatforms();
         this.#createGround();
         this.#createWater();
@@ -28,6 +29,12 @@ export default class SceneFactory {
 
         this.#createEnemies();
         this.#createInteractive();
+    }
+
+    #createDecoration() {
+        for (let i = 22; i < 55; i++){
+            this.#platformsFactory.createJungle(this.#blockSize * i, 0);
+        }
     }
 
     #createPlatforms() {
@@ -136,8 +143,6 @@ export default class SceneFactory {
     }
 
     #createPowerups() {
-        this.#powerupFactory.createPowerup(this.#blockSize*5, 150);
-        this.#powerupFactory.createPowerup(this.#blockSize*15, 150);
         this.#powerupFactory.createPowerup(this.#blockSize*25, 150);
     }
 }

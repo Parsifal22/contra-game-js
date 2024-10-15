@@ -1,8 +1,11 @@
-import { Container, Graphics} from "../lib/pixi.mjs";
+import { Container, Graphics, Sprite} from "../lib/pixi.mjs";
 
 export default class StaticBackground extends Container{
     constructor(screenSize, assets){
         super();
+
+        this.#createMounts(assets, 600, 250, 1.3);
+        this.#createMounts(assets, 820, 230, 1.6);
 
         for (let i=0; i<300; i++) {
             const star = this.#createStar();
@@ -10,6 +13,10 @@ export default class StaticBackground extends Container{
             star.y = Math.random() * screenSize.height;
         }
 
+        const water = new Graphics();
+        water.beginFill(0x0072ec);
+        water.drawRect(0, screenSize.height/2+130, screenSize.width, screenSize.height);
+        this.addChild(water);
     }
 
     #createStar() {
@@ -19,5 +26,14 @@ export default class StaticBackground extends Container{
         this.addChild(star);
 
         return star;
+    }
+
+    #createMounts(assets, x, y, scale) {
+        const mounts = new Sprite(assets.getTexture("mounts0000"));
+        mounts.x = x;
+        mounts.y = y;
+        mounts.scale.x = scale;
+        mounts.scale.y = scale;
+        this.addChild(mounts);
     }
 }
