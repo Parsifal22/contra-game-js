@@ -5,7 +5,7 @@ export default class BossGun extends Entity {
     #target;
     #bulletFactory;
     #timeCounter = 0;
-    #health = 5;
+    #health = 10;
 
     type = "enemy";
 

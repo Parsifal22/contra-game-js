@@ -2,7 +2,7 @@ import Entity from "../../Entity.js";
 
 export default class Boss extends Entity {
 
-    #health = 5;
+    #health = 20;
 
     type = "enemy";
     isBoss = true;

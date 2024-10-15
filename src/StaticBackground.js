@@ -4,8 +4,8 @@ export default class StaticBackground extends Container{
     constructor(screenSize, assets){
         super();
 
-        this.#createMounts(assets, 600, 250, 1.3);
-        this.#createMounts(assets, 820, 230, 1.6);
+        //this.#createMounts(assets, 600, 250, 1.3);
+        //this.#createMounts(assets, 820, 230, 1.6);
 
         for (let i=0; i<300; i++) {
             const star = this.#createStar();
