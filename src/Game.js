@@ -8,6 +8,7 @@ import PowerupsFactory from "./Entities/Powerups/PowerupsFactory.js";
 import KeyboardProcessor from "./KeyboardProcessor.js";
 import Physics from "./Physics.js";
 import SceneFactory from "./SceneFactory.js";
+import StaticBackground from "./StaticBackground.js";
 import Weapon from "./Weapon.js";
 import World from "./World.js";
 
@@ -30,6 +31,8 @@ export default class Game {
         this.#pixiApp = pixiApp;
 
         this.#worldContainer = new World();
+        
+        this.#pixiApp.stage.addChild(new StaticBackground(this.#pixiApp.screen, assets));
         this.#pixiApp.stage.addChild(this.#worldContainer);
 
         const heroFactory = new HeroFactory(this.#worldContainer.game, assets);
