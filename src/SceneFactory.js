@@ -73,10 +73,10 @@ export default class SceneFactory {
     }
 
     #createBossWall() {
-        let xIndexes = [5];
+        let xIndexes = [52];
         this.#create(xIndexes, 170, this.#platformsFactory.createBossWall);
 
-        this.#enemyFactory.createBoss(this.#blockSize * 5, 440);
+        this.#enemyFactory.createBoss(this.#blockSize * 52, 440);
     }
 
     #createInteractive() {
