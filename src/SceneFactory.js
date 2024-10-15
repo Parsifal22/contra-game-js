@@ -48,10 +48,13 @@ export default class SceneFactory {
         xIndexes = [5,6,7, 13,14, 31,32, 49];
         this.#create(xIndexes, 492, this.#platformsFactory.createPlatform);
 
+        xIndexes = [42,43];
+        this.#create(xIndexes, 492, this.#platformsFactory.createPlatform);
+
         xIndexes = [46,47,48];
         this.#create(xIndexes, 578, this.#platformsFactory.createPlatform);
 
-        xIndexes = [8, 11, 28,29,30];
+        xIndexes = [8, 11, 28,29,30, 36,37, 39,40];
         this.#create(xIndexes, 600, this.#platformsFactory.createPlatform);
 
         xIndexes = [50];
@@ -63,19 +66,13 @@ export default class SceneFactory {
         let xIndexes = [9,10, 25,26,27, 32,33,34];
         this.#create(xIndexes, 720, this.#platformsFactory.createStepBox);
 
-        xIndexes = [36,37, 39,40];
-        this.#create(xIndexes, 600, this.#platformsFactory.createBox);
-
-        xIndexes = [42,43];
-        this.#create(xIndexes, 492, this.#platformsFactory.createBox);
-
         xIndexes = [35, 45,46,47,48,49,50,51,52];
-        this.#create(xIndexes, 720, this.#platformsFactory.createBox);
+        this.#create(xIndexes, 730, this.#platformsFactory.createBox);
 
     }
 
     #createWater() {
-        let xIndexes = [0,1,2,3,4,5,6,7,8, 11,12,13,14,15,16,17,18,19,20,21,22,23,24, 28,29,30,31];
+        let xIndexes = [0,1,2,3,4,5,6,7,8, 11,12,13,14,15,16,17,18,19,20,21,22,23,24, 28,29,30,31, 36,37,38,39,40,41,42,43,44];
         this.#create(xIndexes, 768, this.#platformsFactory.createWater);
     }
 

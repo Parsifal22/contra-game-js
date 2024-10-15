@@ -106,6 +106,7 @@ export default class Game {
 
         const isHeroDead = !this.#entities.some(e => e.type == "hero") && this.#hero.isDead;
         if(isHeroDead){
+            this.#weapon.stopFire();
             this.#entities.push(this.#hero);
             this.#worldContainer.game.addChild(this.#hero._view);
             this.#hero.reset();
